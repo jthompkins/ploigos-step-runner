@@ -23,11 +23,11 @@ TODO
 from ploigos_step_runner import StepImplementer, StepResult
 
 DEFAULT_CONFIG = {
-   TODO
+        'src-tls-verify': 'true'
 }
 
 REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS = [
-   TODO
+   'src-tls-verify'
 ]
 
 class HelloWorld(StepImplementer):  
