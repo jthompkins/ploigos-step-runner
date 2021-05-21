@@ -43,6 +43,8 @@ Step Configuration
 * runtime-vulnerability-scan
 * canary-test
 * report
+* publish-workflow-results
+* automated-governance
 
 ### Variable Precedence
 
