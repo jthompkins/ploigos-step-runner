@@ -7,11 +7,12 @@ import sys
 from unittest.mock import patch
 
 import sh
+from ploigos_step_runner import StepResult, StepRunnerException
+from ploigos_step_runner.step_implementers.static_code_analysis import \
+    SonarQube
 from testfixtures import TempDirectory
 from tests.helpers.base_step_implementer_test_case import \
     BaseStepImplementerTestCase
-from ploigos_step_runner import StepResult, StepRunnerException
-from ploigos_step_runner.step_implementers.static_code_analysis import SonarQube
 
 
 class TestStepImplementerSonarQubePackageBase(BaseStepImplementerTestCase):
@@ -173,7 +174,7 @@ class TestStepImplementerSonarQubePackageBase(BaseStepImplementerTestCase):
                     _err=sys.stderr
             )
 
-            self.assertEqual(result.get_step_result_dict(), expected_step_result.get_step_result_dict())
+            self.assertEqual(result, expected_step_result)
 
     @patch('sh.sonar_scanner', create=True)
     def test_run_step_pass_no_username_and_password(self, sonar_mock):
@@ -225,7 +226,7 @@ class TestStepImplementerSonarQubePackageBase(BaseStepImplementerTestCase):
                     _err=sys.stderr
             )
 
-            self.assertEqual(result.get_step_result_dict(), expected_step_result.get_step_result_dict())
+            self.assertEqual(result, expected_step_result)
 
     @patch('sh.sonar_scanner', create=True)
     def test_run_step_fail_no_properties(self, sonar_mock):
@@ -261,7 +262,7 @@ class TestStepImplementerSonarQubePackageBase(BaseStepImplementerTestCase):
             expected_step_result.success = False
             expected_step_result.message = 'Properties file not found: ./sonar-project.properties'
 
-            self.assertEqual(result.get_step_result_dict(), expected_step_result.get_step_result_dict())
+            self.assertEqual(result, expected_step_result)
 
     @patch('sh.sonar_scanner', create=True)
     def test_run_step_pass_alternate_java_truststore(self, sonar_mock):
@@ -321,7 +322,7 @@ class TestStepImplementerSonarQubePackageBase(BaseStepImplementerTestCase):
                     _err=sys.stderr
             )
 
-            self.assertEqual(result.get_step_result_dict(), expected_step_result.get_step_result_dict())
+            self.assertEqual(result, expected_step_result)
 
     def __run__run_step_fail_sonar_scanner_error_test(
         self,

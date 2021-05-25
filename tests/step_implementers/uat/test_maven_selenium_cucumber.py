@@ -11,7 +11,7 @@ from tests.helpers.maven_step_implementer_test_case import \
 from tests.helpers.test_utils import Any
 from ploigos_step_runner.exceptions import StepRunnerException
 from ploigos_step_runner.step_implementers.uat import MavenSeleniumCucumber
-from ploigos_step_runner.step_result import StepResult
+from ploigos_step_runner import StepResult
 from ploigos_step_runner.utils.file import create_parent_dir
 
 
@@ -287,7 +287,7 @@ class TestStepImplementerMavenSeleniumCucumber_Other(TestStepImplementerMavenSel
                 value=cucumber_json_report_path
             )
 
-        self.assertEqual(expected_step_result.get_step_result_dict(), result.get_step_result_dict())
+        self.assertEqual(expected_step_result, result)
 
     @patch.object(MavenSeleniumCucumber, '_generate_maven_settings')
     @patch('sh.mvn', create=True)
