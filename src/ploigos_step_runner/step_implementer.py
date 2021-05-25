@@ -10,7 +10,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 from ploigos_step_runner.config.config_value import ConfigValue
-from ploigos_step_runner.step_result import StepResult
+from ploigos_step_runner import StepResult
 from ploigos_step_runner.utils.io import TextIOIndenter
 
 
@@ -384,7 +384,7 @@ class StepImplementer(ABC):  # pylint: disable=too-many-instance-attributes
         StepImplementer.__print_data('Sub Step Implementer', step_result.sub_step_implementer_name)
         StepImplementer.__print_data('Success', step_result.success)
         StepImplementer.__print_data('Message', step_result.message)
-        StepImplementer.__print_data('Artifacts', step_result.artifacts)
+        StepImplementer.__print_data('Artifacts', step_result.artifacts_dicts)
 
         StepImplementer.__print_section_title(f'Step End - {self.step_name}')
 
