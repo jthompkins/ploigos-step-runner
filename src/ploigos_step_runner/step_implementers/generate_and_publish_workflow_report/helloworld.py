@@ -20,14 +20,15 @@ TODO
 """
 
 
-from ploigos_step_runner import StepImplementer, StepResult
+from ploigos_step_runner.step_implementer import StepImplementer
+from ploigos_step_runner import StepResult
 
 DEFAULT_CONFIG = {
-        'src-tls-verify': 'true'
+        'hello': 'world'
 }
 
 REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS = [
-   'src-tls-verify'
+   'hello_world'
 ]
 
 class HelloWorld(StepImplementer):  
@@ -71,7 +72,12 @@ class HelloWorld(StepImplementer):
         """
         step_result = StepResult.from_step_implementer(self)
 	
-        print("Hello World")
+        hello_world = "Hello World"
+
+        print(hello_world)
+        step_result.add_artifact(name='hello-world', value=hello_world)
+        step_result.message = "Hello World"
+
 
         return step_result
 
