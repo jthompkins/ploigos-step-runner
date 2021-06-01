@@ -138,7 +138,7 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         }
         return rekor_entry;
 
-    def upload_to_rekor(self, rekor_server, extra_data_file):
+    def upload_to_rekor(self, rekor_server, extra_data_file, gpg_key):
         """Runs the step implemented by this StepImplementer.
 
         Returns
@@ -146,10 +146,8 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         StepResult
             Object containing the dictionary results of this step.
         """
-        gpg_key = self.get_value('gpg-key')
         rekor_entry = self.create_rekor_entry(gpg_key, extra_data_file)
         print("Rekor Entry: " + str(rekor_entry))
-        # print("Rekor Entry Type: "+ str(type(rekor_entry)))
         rekor_entry_path = Path(os.path.join(self.work_dir_path, 'entry.json'))
 
         if rekor_entry_path.exists():
@@ -210,7 +208,7 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         if extra_data_file_path.exists():
             extra_data_file_path.unlink()
         extra_data_file_path.write_text(json.dumps(all_workflows))
-        rekor_entry, rekor_uuid = self.upload_to_rekor(rekor_server, extra_data_file)
+        rekor_entry, rekor_uuid = self.upload_to_rekor(rekor_server, extra_data_file, self.get_value('gpg-key'))
         step_result.add_artifact(
                 name='rekor-entry',
                 value=rekor_entry
