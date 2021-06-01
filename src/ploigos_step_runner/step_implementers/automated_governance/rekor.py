@@ -44,7 +44,7 @@ from ploigos_step_runner.utils.io import TextIOIndenter
 from ploigos_step_runner.utils.dict import deep_merge
 from ploigos_step_runner.utils.file import base64_encode
 from ploigos_step_runner.utils.file import get_file_hash
-
+from ploigos_step_runner.utils.gpg import get_gpg_key
 
 
 DEFAULT_CONFIG = {
@@ -113,7 +113,7 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         sig_file_path = Path(sig_file)
         if sig_file_path.exists():
             sig_file_path.unlink()
-        self.get_gpg_key(sig_file,extra_data_file)
+        get_gpg_key(sig_file,extra_data_file, self.get_value('gpg-user'))
         base64_encoded_extra_data = base64_encode(extra_data_file)
         rekor_entry = {
             "kind": "rekord",
@@ -137,35 +137,6 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
             }
         }
         return rekor_entry;
-
-    def get_gpg_key(self, sig_file, extra_data_file):
-        """Runs the step implemented by this StepImplementer.
-
-        Returns
-        -------
-        StepResult
-            Object containing the dictionary results of this step.
-        """
-        gpg_stdout_result = StringIO()
-        gpg_stdout_callback = create_sh_redirect_to_multiple_streams_fn_callback([
-            sys.stdout,
-            gpg_stdout_result
-        ])
-        gpg_user = self.get_value('gpg-user')
-        sh.gpg(
-            '--armor',
-            '-u',
-            gpg_user,
-            '--output',
-            sig_file,
-            '--detach-sign',
-            extra_data_file,
-            _out=gpg_stdout_callback,
-            # _in=extra_data,
-            _err_to_out=True,
-            _tee='out'
-        )
-        return gpg_stdout_result
 
     def upload_to_rekor(self, rekor_server, extra_data_file):
         """Runs the step implemented by this StepImplementer.
