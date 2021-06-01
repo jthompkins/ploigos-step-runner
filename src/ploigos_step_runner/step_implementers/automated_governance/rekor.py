@@ -42,6 +42,8 @@ from ploigos_step_runner import StepImplementer, StepResult, WorkflowResult
 from ploigos_step_runner.utils.io import create_sh_redirect_to_multiple_streams_fn_callback
 from ploigos_step_runner.utils.io import TextIOIndenter
 from ploigos_step_runner.utils.dict import deep_merge
+from ploigos_step_runner.utils.file import base64_encode
+from ploigos_step_runner.utils.file import get_file_hash
 
 
 
@@ -95,34 +97,6 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         """
         return REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS
 
-    @staticmethod
-    def base64_encode(
-            file_path
-    ):
-        """Given a file_path, read and encode the contents in base64
-        Returns
-        -------
-        Base64Contents
-            base64 encoded string of file contents
-        """
-        encoding = Path(file_path).read_text().encode('utf-8')
-        return base64.b64encode(encoding).decode('utf-8')
-
-    def get_file_hash(self, file_path):
-        """Returns file hash of given file.
-
-        Returns
-        -------
-        StepResult
-            Object containing the dictionary results of this step.
-        """
-        sha256_hash = hashlib.sha256()
-        with open(file_path, "rb") as f:
-            # Read and update hash string value in blocks of 4K
-            for byte_block in iter(lambda: f.read(4096), b""):
-                sha256_hash.update(byte_block)
-        return sha256_hash.hexdigest()
-
     def create_rekor_entry( self,
         public_key_path,
         extra_data_file
@@ -134,22 +108,22 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         StepResult
             Dict that contains rekor entry for upload with the cli
         """
-        hash = self.get_file_hash(extra_data_file)
+        hash = get_file_hash(extra_data_file)
         sig_file = extra_data_file + '.asc'
         sig_file_path = Path(sig_file)
         if sig_file_path.exists():
             sig_file_path.unlink()
         self.get_gpg_key(sig_file,extra_data_file)
-        base64_encoded_extra_data = self.base64_encode(extra_data_file)
+        base64_encoded_extra_data = base64_encode(extra_data_file)
         rekor_entry = {
             "kind": "rekord",
             "apiVersion": "0.0.1",
             "spec": {
                 "signature": {
                     "format": "pgp",
-                    "content": self.base64_encode(sig_file),
+                    "content": base64_encode(sig_file),
                     "publicKey": {
-                        "content": self.base64_encode(public_key_path)
+                        "content": base64_encode(public_key_path)
                     }
                 },
                 "data": {
