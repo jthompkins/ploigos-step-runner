@@ -160,37 +160,17 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
             rekor_upload_stdout_result
         ])
         rekor = sh.rekor(
-                'upload',
-                '--rekor_server',
-                rekor_server,
-                '--entry',
-                rekor_entry_path_name,
-                _out=rekor_upload_stdout_callback,
-                _err_to_out=True,
-                _tee='out'
-                )
+            'upload',
+            '--rekor_server',
+            rekor_server,
+            '--entry',
+            rekor_entry_path_name,
+            _out=rekor_upload_stdout_callback,
+            _err_to_out=True,
+            _tee='out'
+        )
         rekor_uuid = str(rekor).split('/')[-1].strip(' \n')
         return rekor_entry, rekor_uuid
-
-    def get_all_step_results_dict(self):
-        """Get a dictionary of all of the recorded StepResults.
-
-        Returns
-        -------
-        results: dict
-            results of all steps from list
-        """
-        all_results = {}
-        for step_result in self.workflow_result.workflow_list:
-            all_results = deep_merge(
-                dest=all_results,
-                source=step_result.get_step_result_dict(),
-                overwrite_duplicate_keys=True
-            )
-        step_runner_results = {
-            'step-runner-results': all_results
-        }
-        return step_runner_results
 
     def _run_step(self):
         """Runs the step implemented by this StepImplementer.
@@ -202,12 +182,11 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         """
         step_result = StepResult.from_step_implementer(self)
         rekor_server = self.get_value('rekor-server')
-        all_workflows = self.get_all_step_results_dict()
         extra_data_file = os.path.join(self.work_dir_path, self.step_name+'.json')
         extra_data_file_path = Path(extra_data_file)
         if extra_data_file_path.exists():
             extra_data_file_path.unlink()
-        extra_data_file_path.write_text(json.dumps(all_workflows))
+        self.workflow_result.write_results_to_json_file(extra_data_file_path)
         rekor_entry, rekor_uuid = self.upload_to_rekor(rekor_server, extra_data_file, self.get_value('gpg-key'))
         step_result.add_artifact(
                 name='rekor-entry',
