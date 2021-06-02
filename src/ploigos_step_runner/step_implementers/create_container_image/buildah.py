@@ -102,34 +102,25 @@ class Buildah(StepImplementer):
         """
         return REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS
 
-    def get_file_hash(self, application_name, service_name, tar_file):
-        """Returns file hash of given file.
+    def get_image_hash(self, image_ref):
+        """Returns hash of given image.
 
         Returns
         -------
         StepResult
             Object containing the dictionary results of this step.
         """
-        # Has to be a better way to get image hash
-        pod = StringIO()
-        sh.podman.load('-q', '-i', tar_file, _out=pod)
-        image_name = pod.getvalue().rstrip().split('@')[-1]
-        buf = StringIO()
-        # image_name = application_name + '/' + service_name
-        sh.buildah.inspect(image_name,_out=buf)
+        image_hash = StringIO()
+        sh.buildah.images(
+            '--storage-driver=vfs',
+            '--digests',
+            '--format',
+            '"{{.Digest}}"',
+            image_ref,
+            _out=image_hash
+        )
 
-        for line in buf.getvalue().rsplit('\n'):
-            if 'FromImageDigest' in line:
-                hash = line.split(':')[-1].strip(' ,\"\n')
-                sh.podman.rmi(image_name)
-                return hash
-        # Returning hash for image tar is unreliable
-        # sha256_hash = hashlib.sha256()
-        # with open(file_path, "rb") as f:
-        #     # Read and update hash string value in blocks of 4K
-        #     for byte_block in iter(lambda: f.read(4096), b""):
-        #         sha256_hash.update(byte_block)
-        # return sha256_hash.hexdigest()
+        return image_hash
 
     def _run_step(self):
         """Runs the step implemented by this StepImplementer.
@@ -227,7 +218,7 @@ class Buildah(StepImplementer):
                 _err=sys.stderr,
                 _tee='err'
             )
-            image_tar_hash = self.get_file_hash(application_name, service_name, image_tar_path)
+            image_tar_hash = self.get_image_hash(tag)
             step_result.add_artifact(
                 name='image-tar-file',
                 value=image_tar_path

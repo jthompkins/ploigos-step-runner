@@ -46,13 +46,6 @@ from ploigos_step_runner.utils.file import base64_encode
 from ploigos_step_runner.utils.file import get_file_hash
 from ploigos_step_runner.utils.gpg import get_gpg_key
 
-
-DEFAULT_CONFIG = {
-    'rekor-server': '',
-    'gpg-key': '',
-    'gpg-user': ''
-}
-
 REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS = [
     'rekor-server',
     'gpg-key',
@@ -63,22 +56,6 @@ REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS = [
 class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
     """`StepImplementer` for the `automated-governance` step using Rekor.
     """
-
-    @staticmethod
-    def step_implementer_config_defaults():
-        """Getter for the StepImplementer's configuration defaults.
-
-        Returns
-        -------
-        dict
-            Default values to use for step configuration values.
-
-        Notes
-        -----
-        These are the lowest precedence configuration values.
-
-        """
-        return DEFAULT_CONFIG
 
     @staticmethod
     def _required_config_or_result_keys():
