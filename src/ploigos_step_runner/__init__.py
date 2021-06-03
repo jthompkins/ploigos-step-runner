@@ -42,6 +42,8 @@ Step Configuration
 * uat
 * runtime-vulnerability-scan
 * canary-test
+* publish-workflow-results
+* automated-governance
 * report
 * publish-workflow-results
 * automated-governance
