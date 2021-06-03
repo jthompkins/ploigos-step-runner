@@ -60,7 +60,7 @@ class TestStepImplementerCreateContainerImageBuildah(BaseStepImplementerTestCase
     @patch('sh.buildah', create=True)
     def test_get_image_hash(self, buildah_mock):
         image_ref = 'localhost/app-name/service-name:1.0-123abc'
-        Buildah.get_image_hash(image_ref)
+        Buildah.get_image_hash(None, image_ref)
         buildah_mock.images.assert_called_once_with(
             '--storage-driver=vfs',
             '--digests',
@@ -427,6 +427,7 @@ class TestStepImplementerCreateContainerImageBuildah(BaseStepImplementerTestCase
                 f'image-{application_name}-{service_name}-{image_tag_version}.tar'
             )
             self.assertFalse(result.success)
+            print(result.message)
             self.assertRegex(
                 result.message,
                 re.compile(
