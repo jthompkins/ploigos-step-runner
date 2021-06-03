@@ -120,7 +120,7 @@ class TestStepImplementerAutomatedGovernanceRekor(BaseStepImplementerTestCase):
             self.assertEqual(result_uuid, TEST_REKOR_UUID)
 
     @patch.object(Rekor, 'upload_to_rekor')
-    def test_run_step(self, upload_mock):
+    def test__run_step(self, upload_mock):
         """
         Testing extra_data in rekor_entry
         """
