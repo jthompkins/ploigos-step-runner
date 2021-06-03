@@ -7,16 +7,11 @@ from unittest.mock import patch
 from io import IOBase
 
 import sh
-from ploigos_step_runner import StepResult
-from ploigos_step_runner.step_implementers.create_container_image import \
-    Buildah
 from testfixtures import TempDirectory
-from tests.helpers.base_step_implementer_test_case import \
-    BaseStepImplementerTestCase
+from tests.helpers.base_step_implementer_test_case import BaseStepImplementerTestCase
 from ploigos_step_runner.step_implementers.create_container_image import Buildah
-from ploigos_step_runner.step_result import StepResult
+from ploigos_step_runner import WorkflowResult, StepResult
 from tests.helpers.test_utils import Any
-from ploigos_step_runner.workflow_result import WorkflowResult
 
 
 class TestStepImplementerCreateContainerImageBuildah(BaseStepImplementerTestCase):
