@@ -170,3 +170,5 @@ class TestStepImplementerAutomatedGovernanceRekor(BaseStepImplementerTestCase):
                 gpg_key,
                 gpg_user
             )
+
+            self.assertEqual(result.get_step_result_dict(), expected_step_result.get_step_result_dict())
