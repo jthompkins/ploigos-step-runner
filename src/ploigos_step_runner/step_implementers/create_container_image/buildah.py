@@ -28,14 +28,12 @@ Result Artifact Key | Description
 --------------------------|------------
 `container-image-version` | Container version to tag built image with
 `image-tar-file`          | Path to the built container image as a tar file
-`image-tar-hash`          | Path to the built container image as a tar file
 """
 import os
 import sys
 from pathlib import Path
-import hashlib
+
 import sh
-from io import StringIO
 from ploigos_step_runner import StepImplementer, StepResult
 from ploigos_step_runner.utils.containers import container_registries_login
 
@@ -101,26 +99,6 @@ class Buildah(StepImplementer):
             that are required before running the step.
         """
         return REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS
-
-    def get_image_hash(self, image_ref):
-        """Returns hash of given image.
-
-        Returns
-        -------
-        StepResult
-            Object containing the dictionary results of this step.
-        """
-        image_hash = StringIO()
-        sh.buildah.images(
-            '--storage-driver=vfs',
-            '--digests',
-            '--format',
-            '"{{.Digest}}"',
-            image_ref,
-            _out=image_hash
-        )
-
-        return image_hash
 
     def _run_step(self):
         """Runs the step implemented by this StepImplementer.
@@ -218,16 +196,11 @@ class Buildah(StepImplementer):
                 _err=sys.stderr,
                 _tee='err'
             )
-            image_tar_hash = self.get_image_hash(tag)
+
             step_result.add_artifact(
                 name='image-tar-file',
                 value=image_tar_path
             )
-            step_result.add_artifact(
-                name='image-tar-hash',
-                value=image_tar_hash
-            )
-
         except sh.ErrorReturnCode as error:  # pylint: disable=undefined-variable
             step_result.success = False
             step_result.message = f'Issue invoking buildah push to tar file ' \
