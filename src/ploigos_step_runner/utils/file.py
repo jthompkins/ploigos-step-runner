@@ -7,8 +7,12 @@ import os
 import re
 import shutil
 import urllib.request
+import hashlib
+import base64
 
 import yaml
+
+from pathlib import Path
 
 def parse_yaml_or_json_file(yaml_or_json_file):
     """
