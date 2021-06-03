@@ -372,6 +372,14 @@ From least precedence to highest precedence.
           #format: 'oci'
         }
 
+      automated-governance:
+      - implementer: Rekor
+        config: {
+          rekor-server: 'http://example-rekor-server-url/',
+          gpg-key: '/path/to/gpg-key',
+          gpg-user: 'gpg-user@example.com'
+        }
+
       push-container-image:
       - implementer: Skopeo
         config: {
@@ -668,6 +676,14 @@ From least precedence to highest precedence.
 
           # Optional.
           #format: 'oci'
+        }
+
+      automated-governance:
+      - implementer: Rekor
+        config: {
+          rekor-server: 'http://example-rekor-server-url/',
+          gpg-key: '/path/to/gpg-key',
+          gpg-user: 'gpg-user@example.com'
         }
 
       push-container-image:

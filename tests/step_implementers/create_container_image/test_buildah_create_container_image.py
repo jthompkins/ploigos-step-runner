@@ -59,7 +59,21 @@ class TestStepImplementerCreateContainerImageBuildah(BaseStepImplementerTestCase
         self.assertEqual(required_keys, expected_required_keys)
 
     @patch('sh.buildah', create=True)
-    def test__run_step_pass(self, buildah_mock):
+    def test_get_image_hash(self, buildah_mock):
+        image_ref = 'localhost/app-name/service-name:1.0-123abc'
+        Buildah.get_image_hash(image_ref)
+        buildah_mock.images.assert_called_once_with(
+            '--storage-driver=vfs',
+            '--digests',
+            '--format',
+            '"{{.Digest}}"',
+            image_ref,
+            _out=Any(IOBase)
+        )
+
+    @patch.object(Buildah, 'get_image_hash')
+    @patch('sh.buildah', create=True)
+    def test__run_step_pass(self, image_hash_mock, buildah_mock):
         with TempDirectory() as temp_dir:
             results_dir_path = os.path.join(temp_dir.path, 'step-runner-results')
             results_file_name = 'step-runner-results.yml'
@@ -91,7 +105,10 @@ class TestStepImplementerCreateContainerImageBuildah(BaseStepImplementerTestCase
 
             self.setup_previous_result(work_dir_path, artifact_config)
 
-            # image_tar_hash = hashlib.sha256(Path(work_dir_path + '/create-container-image/image-app-name-service-name-1.0-123abc.tar').read_bytes()).hexdigest()
+            def image_hash_mock_side_effect(image_ref):
+                return '0af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf'
+
+            image_hash_mock.side_effect = image_hash_mock_side_effect
 
             result = step_implementer._run_step()
 
@@ -110,9 +127,8 @@ class TestStepImplementerCreateContainerImageBuildah(BaseStepImplementerTestCase
             )
             expected_step_result.add_artifact(
                 name='image-tar-hash',
-                value='None'
+                value='0af2bdbe1aa9b6ec1e2ade1d694f41fc71a831d0268e9891562113d8a62add1bf'
             )
-
 
             buildah_mock.bud.assert_called_once_with(
                 '--storage-driver=vfs',
