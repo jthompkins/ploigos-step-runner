@@ -8,8 +8,7 @@ from pathlib import Path
 import sh
 from testfixtures import TempDirectory
 from ploigos_step_runner.step_implementers.automated_governance import Rekor
-from ploigos_step_runner.step_result import StepResult
-from ploigos_step_runner.workflow_result import WorkflowResult
+from ploigos_step_runner import WorkflowResult, StepResult
 from tests.helpers.base_step_implementer_test_case import BaseStepImplementerTestCase
 from unittest.mock import patch
 from tests.helpers.test_utils import Any
@@ -170,8 +169,8 @@ class TestStepImplementerAutomatedGovernanceRekor(BaseStepImplementerTestCase):
                 sub_step_implementer_name='Rekor'
             )
 
-            expected_step_result.add_artifact(name='rekor-uuid', value=TestStepImplementerAutomatedGovernanceRekor.TEST_REKOR_UUID)
             expected_step_result.add_artifact(name='rekor-entry', value=TestStepImplementerAutomatedGovernanceRekor.TEST_REKOR_ENTRY)
+            expected_step_result.add_artifact(name='rekor-uuid', value=TestStepImplementerAutomatedGovernanceRekor.TEST_REKOR_UUID)
 
             def upload_mock_side_effect(rekor_server, extra_data_file, gpg_key, gpg_user, work_dir_path):
                 return TestStepImplementerAutomatedGovernanceRekor.TEST_REKOR_ENTRY, TestStepImplementerAutomatedGovernanceRekor.TEST_REKOR_UUID
