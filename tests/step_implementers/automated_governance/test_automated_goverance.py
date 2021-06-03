@@ -100,7 +100,7 @@ class TestStepImplementerAutomatedGovernanceRekor(BaseStepImplementerTestCase):
                 return TEST_REKOR_ENTRY
 
             def rekor_mock_side_effect(*args, **kwargs):
-                print('Created entry at: https://' + args[2]+ '/api/v1/log/entries/' + TEST_REKOR_UUID)
+                print('Created entry at: ' + args[2]+ '/api/v1/log/entries/' + TEST_REKOR_UUID)
 
             create_mock.side_effect = create_mock_side_effect
             rekor_mock.side_effect = rekor_mock_side_effect
