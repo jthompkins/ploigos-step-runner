@@ -4,15 +4,14 @@ from io import IOBase, StringIO
 from shutil import copyfile
 from unittest.mock import patch
 
+from ploigos_step_runner import StepResult, WorkflowResult
+from ploigos_step_runner.config.config import Config
+from ploigos_step_runner.step_implementers.unit_test import Maven
+from ploigos_step_runner.utils.file import create_parent_dir
 from testfixtures import TempDirectory
 from tests.helpers.maven_step_implementer_test_case import \
     MaveStepImplementerTestCase
 from tests.helpers.test_utils import Any
-from ploigos_step_runner.config.config import Config
-from ploigos_step_runner.step_implementers.unit_test import Maven
-from ploigos_step_runner.step_result import StepResult
-from ploigos_step_runner.utils.file import create_parent_dir
-from ploigos_step_runner.workflow_result import WorkflowResult
 
 
 class TestStepImplementerMavenUnitTest(MaveStepImplementerTestCase):
@@ -164,7 +163,7 @@ class TestStepImplementerMavenUnitTest(MaveStepImplementerTestCase):
             self.assertRegex(result.message, expected_result_message_regex)
             self.assertEqual(result.artifacts, expected_step_result.artifacts)
         else:
-            self.assertEqual(result.get_step_result_dict(), expected_step_result.get_step_result_dict())
+            self.assertEqual(result, expected_step_result)
 
     @patch.object(Maven, '_generate_maven_settings')
     @patch('sh.mvn', create=True)

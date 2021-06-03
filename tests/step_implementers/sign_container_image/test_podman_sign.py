@@ -14,7 +14,7 @@ from tests.helpers.base_step_implementer_test_case import \
 from tests.helpers.test_utils import Any, StringRegexParam
 from ploigos_step_runner.exceptions import StepRunnerException
 from ploigos_step_runner.step_implementers.sign_container_image import PodmanSign
-from ploigos_step_runner.step_result import StepResult
+from ploigos_step_runner import StepResult
 
 
 class TestStepImplementerSignContainerImagePodman(BaseStepImplementerTestCase):
@@ -173,7 +173,7 @@ class TestStepImplementerSignContainerImagePodman(BaseStepImplementerTestCase):
                 name='container-image-signature-private-key-fingerprint',
                 value=pgp_private_key_fingerprint
             )
-            self.assertEqual(expected_step_result.get_step_result_dict(), result.get_step_result_dict())
+            self.assertEqual(expected_step_result, result)
 
     @patch.object(PodmanSign, '_PodmanSign__import_pgp_key')
     @patch.object(PodmanSign, '_PodmanSign__sign_image')
@@ -223,7 +223,7 @@ class TestStepImplementerSignContainerImagePodman(BaseStepImplementerTestCase):
             expected_step_result.success = False
             expected_step_result.message = 'mock error importing pgp key'
 
-            self.assertEqual(expected_step_result.get_step_result_dict(), result.get_step_result_dict())
+            self.assertEqual(expected_step_result, result)
 
     @patch.object(PodmanSign, '_PodmanSign__import_pgp_key')
     @patch.object(PodmanSign, '_PodmanSign__sign_image')
@@ -280,7 +280,7 @@ class TestStepImplementerSignContainerImagePodman(BaseStepImplementerTestCase):
             expected_step_result.success = False
             expected_step_result.message = 'mock error signing image'
 
-            self.assertEqual(expected_step_result.get_step_result_dict(), result.get_step_result_dict())
+            self.assertEqual(expected_step_result, result)
 
     @patch('sh.gpg', create=True)
     def test___import_pgp_key_success(self, gpg_mock):
