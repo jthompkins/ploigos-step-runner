@@ -43,7 +43,7 @@ from ploigos_step_runner.utils.io import TextIOIndenter
 from ploigos_step_runner.utils.dict import deep_merge
 from ploigos_step_runner.utils.file import base64_encode
 from ploigos_step_runner.utils.file import get_file_hash
-from ploigos_step_runner.utils.gpg import get_gpg_key
+from ploigos_step_runner.utils.gpg import import_gpg_key
 
 REQUIRED_CONFIG_OR_PREVIOUS_STEP_RESULT_ARTIFACT_KEYS = [
     'rekor-server',
@@ -94,7 +94,7 @@ class Rekor(StepImplementer):  # pylint: disable=too-few-public-methods
         sig_file_path = Path(sig_file)
         if sig_file_path.exists():
             sig_file_path.unlink()
-        get_gpg_key(sig_file, extra_data_file, gpg_user)
+        import_gpg_key(sig_file, extra_data_file, gpg_user)
         base64_encoded_extra_data = base64_encode(extra_data_file)
         rekor_entry = {
             "kind": "rekord",
