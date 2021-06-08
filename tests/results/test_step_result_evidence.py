@@ -1,142 +1,142 @@
-"""Test StepResultArtifact
+"""Test StepResultEvidence
 """
 
-from ploigos_step_runner.results import StepResultArtifact
+from ploigos_step_runner.results import StepResultEvidence
 from tests.helpers.base_test_case import BaseTestCase
 
 
-class TestStepResultArtifactTest(BaseTestCase):
-    """Test StepResultArtifact
+class TestStepResultEvidenceTest(BaseTestCase):
+    """Test StepResultEvidence
     """
 
     def test_name(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello'
         )
 
-        self.assertEqual('foo', artifact.name)
+        self.assertEqual('foo', evidence.name)
 
     def test_value(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello'
         )
 
-        self.assertEqual('hello', artifact.value)
+        self.assertEqual('hello', evidence.value)
 
     def test_description_empty(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello'
         )
 
-        self.assertEqual("", artifact.description)
+        self.assertEqual("", evidence.description)
 
     def test_description(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        self.assertEqual("test description", artifact.description)
+        self.assertEqual("test description", evidence.description)
 
     def test_as_dict_no_description(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello'
         )
 
         expected = {'description': '', 'name': 'foo', 'value': 'hello'}
-        self.assertEqual(expected, artifact.as_dict())
+        self.assertEqual(expected, evidence.as_dict())
 
     def test_as_dict_with_description(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
         expected = {'description': 'test description', 'name': 'foo', 'value': 'hello'}
-        self.assertEqual(expected, artifact.as_dict())
+        self.assertEqual(expected, evidence.as_dict())
 
     def test___str__(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
         expected = "{'name': 'foo', 'value': 'hello', 'description': 'test description'}"
-        self.assertEqual(expected, str(artifact))
+        self.assertEqual(expected, str(evidence))
 
     def test___repr__(self):
-        artifact = StepResultArtifact(
+        evidence = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        expected = "StepResultArtifact(name=foo, value=hello, description=test description)"
-        self.assertEqual(expected, repr(artifact))
+        expected = "StepResultEvidence(name=foo, value=hello, description=test description)"
+        self.assertEqual(expected, repr(evidence))
 
     def test___eq__(self):
-        artifact1 = StepResultArtifact(
+        evidence1 = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        artifact2 = StepResultArtifact(
+        evidence2 = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        self.assertEqual(artifact1, artifact2)
+        self.assertEqual(evidence1, evidence2)
 
     def test___nq__name(self):
-        artifact1 = StepResultArtifact(
+        evidence1 = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        artifact2 = StepResultArtifact(
+        evidence2 = StepResultEvidence(
             name='bad',
             value='hello',
             description='test description'
         )
 
-        self.assertNotEqual(artifact1, artifact2)
+        self.assertNotEqual(evidence1, evidence2)
 
     def test___nq__value(self):
-        artifact1 = StepResultArtifact(
+        evidence1 = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        artifact2 = StepResultArtifact(
+        evidence2 = StepResultEvidence(
             name='foo',
             value='bad',
             description='test description'
         )
 
-        self.assertNotEqual(artifact1, artifact2)
+        self.assertNotEqual(evidence1, evidence2)
 
     def test___nq__description(self):
-        artifact1 = StepResultArtifact(
+        evidence1 = StepResultEvidence(
             name='foo',
             value='hello',
             description='test description'
         )
 
-        artifact2 = StepResultArtifact(
+        evidence2 = StepResultEvidence(
             name='foo',
             value='hello',
             description='bad'
         )
 
-        self.assertNotEqual(artifact1, artifact2)
+        self.assertNotEqual(evidence1, evidence2)
