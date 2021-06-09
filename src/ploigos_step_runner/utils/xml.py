@@ -2,6 +2,7 @@
 Shared utils for dealing with XML.
 """
 
+import glob
 import re
 import os.path
 from xml.etree import ElementTree
@@ -87,3 +88,44 @@ def get_xml_element_by_path(xml_file_path, xpath, default_namespace=None, xml_na
         return xml_file.find(xpath)
 
     return xml_file.find(xpath, namespaces)
+
+def parse_xml_element_for_attributes(xml_file_path, xml_element, attribs):
+    """
+    Function to parse a XML file looking for a specific element and obtaining its attributes
+
+    Vars:   xml_file_path   - Path to directory containing XML files
+            xml_element     - XML element being searched for
+            attribs         - List of attributes being searched for in the XML element
+
+    Returns: A dictionary of attribute values.
+    """
+
+    report_results = {}
+
+    #Search file path for XML files
+
+    if os.path.isdir(xml_file_path):
+        xml_files = glob.glob(xml_file_path + '/*.xml', recursive=False)
+    elif os.path.isfile(xml_file_path):
+        xml_files = [xml_file_path]
+
+    print("files: " + str(xml_files))
+    #Iterate over XML files
+    for file in xml_files:
+        try:
+            pom_element = get_xml_element(file, xml_element).text
+        except ValueError as error:
+            print(f"Error parsing XML file for element: {error}")
+            #raise StepRunnerException(f"Error parsing XML file for element: {error}") from error
+
+        #Add attributes to dictionary
+        for attrib in attribs:
+
+            attribute_value = pom_element.attrib[attrib]
+
+            if report_results[attrib] is None:
+                report_results[attrib] = attribute_value
+            else:
+                report_results[attrib] = str(float(report_results[attrib]) + float(attribute_value))
+
+    return report_results

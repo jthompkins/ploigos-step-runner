@@ -2,10 +2,11 @@
 
 Test for the utility for xml operations.
 """
+import os
 from os import path
 from testfixtures import TempDirectory
 from tests.helpers.base_test_case import BaseTestCase
-from ploigos_step_runner.utils.xml import get_xml_element, get_xml_element_by_path
+from ploigos_step_runner.utils.xml import get_xml_element, get_xml_element_by_path, parse_xml_element_for_attributes
 
 # pylint: disable=no-self-use
 class TestXMLUtils(BaseTestCase):
@@ -216,3 +217,28 @@ class TestXMLUtils(BaseTestCase):
             )
 
             assert element is None
+
+    def test_parse_xml_element_for_attributes(self):
+        """Test to get an xml attribute from xml element 
+        
+        xml_file_path, xml_element, attribs
+        """
+
+        sample_file_path = os.path.join(
+            os.path.dirname(__file__),
+            'files',
+            'sample.xml'
+        )
+
+        element = 'testsuite'
+        attribs = ['time', 'tests']
+
+        results = parse_xml_element_for_attributes(sample_file_path, element, attribs)
+
+        expected_results = {'tests': '3', 'time': '4.485'}
+
+        self.assertEqual(results, expected_results)
+        
+
+
+
