@@ -29,7 +29,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
             self,
             step_config={},
             workflow_result=None,
-            work_dir_path=''
+            parent_work_dir_path=''
     ):
         return self.create_given_step_implementer(
             step_implementer=SampleMavenStepImplementer,
@@ -37,15 +37,13 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
             step_name='foo',
             implementer='SampleMavenStepImplementer',
             workflow_result=workflow_result,
-            work_dir_path=work_dir_path
+            parent_work_dir_path=parent_work_dir_path
         )
 
     @patch('ploigos_step_runner.step_implementers.shared.maven_generic.generate_maven_settings')
     def test__generate_maven_settings(self, utils_generate_maven_settings_mock):
         with TempDirectory() as test_dir:
-            results_dir_path = os.path.join(test_dir.path, 'step-runner-results')
-            results_file_name = 'step-runner-results.yml'
-            work_dir_path = os.path.join(test_dir.path, 'working')
+            parent_work_dir_path = os.path.join(test_dir.path, 'working')
             maven_servers = {
                 "internal-mirror": {
                     "id": "internal-server",
@@ -74,7 +72,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
             }
             step_implementer = self.create_step_implementer(
                 step_config=step_config,
-                work_dir_path=work_dir_path,
+                parent_work_dir_path=parent_work_dir_path,
             )
 
             expected_settings_xml_path = '/does/not/matter/settings.xml'
@@ -92,7 +90,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
             self.assertEqual(expected_settings_xml_path, actual_settings_xml_path)
 
             utils_generate_maven_settings_mock.assert_called_once_with(
-                working_dir=work_dir_path,
+                working_dir=step_implementer.work_dir_path,
                 maven_servers=maven_servers,
                 maven_repositories=maven_repositories,
                 maven_mirrors=maven_mirrors
@@ -102,7 +100,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
         with TempDirectory() as test_dir:
             results_dir_path = os.path.join(test_dir.path, 'step-runner-results')
             results_file_name = 'step-runner-results.yml'
-            work_dir_path = os.path.join(test_dir.path, 'working')
+            parent_work_dir_path = os.path.join(test_dir.path, 'working')
 
             pom_file_path = os.path.join(test_dir.path, 'pom.xml')
             step_config = {
@@ -112,7 +110,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
 
             step_implementer = self.create_step_implementer(
                 step_config=step_config,
-                work_dir_path=work_dir_path,
+                parent_work_dir_path=parent_work_dir_path,
             )
 
             Path(pom_file_path).touch()
@@ -122,7 +120,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
         with TempDirectory() as test_dir:
             results_dir_path = os.path.join(test_dir.path, 'step-runner-results')
             results_file_name = 'step-runner-results.yml'
-            work_dir_path = os.path.join(test_dir.path, 'working')
+            parent_work_dir_path = os.path.join(test_dir.path, 'working')
 
             pom_file_path = os.path.join(test_dir.path, 'pom.xml')
             step_config = {
@@ -132,7 +130,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
 
             step_implementer = self.create_step_implementer(
                 step_config=step_config,
-                work_dir_path=work_dir_path,
+                parent_work_dir_path=parent_work_dir_path,
             )
 
             with self.assertRaisesRegex(
@@ -144,9 +142,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
     @patch('ploigos_step_runner.step_implementers.shared.maven_generic.write_effective_pom')
     def test__get_effective_pom_call_once(self, write_effective_pom_mock):
         with TempDirectory() as test_dir:
-            results_dir_path = os.path.join(test_dir.path, 'step-runner-results')
-            results_file_name = 'step-runner-results.yml'
-            work_dir_path = os.path.join(test_dir.path, 'working')
+            parent_work_dir_path = os.path.join(test_dir.path, 'working')
 
             pom_file_path = os.path.join(test_dir.path, 'pom.xml')
             step_config = {
@@ -155,7 +151,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
 
             step_implementer = self.create_step_implementer(
                 step_config=step_config,
-                work_dir_path=work_dir_path,
+                parent_work_dir_path=parent_work_dir_path,
             )
 
             # mock effective pom
@@ -166,7 +162,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
             write_effective_pom_mock.side_effect = write_effective_pom_mock_side_effect
 
             # first call
-            expected_effective_pom_path = os.path.join(work_dir_path, 'effective-pom.xml')
+            expected_effective_pom_path = os.path.join(step_implementer.work_dir_path, 'effective-pom.xml')
             actual_effective_pom_path = step_implementer._get_effective_pom()
             self.assertEqual(actual_effective_pom_path, expected_effective_pom_path)
             write_effective_pom_mock.assert_called_once_with(
@@ -177,9 +173,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
     @patch('ploigos_step_runner.step_implementers.shared.maven_generic.write_effective_pom')
     def test__get_effective_pom_call_twice(self, write_effective_pom_mock):
         with TempDirectory() as test_dir:
-            results_dir_path = os.path.join(test_dir.path, 'step-runner-results')
-            results_file_name = 'step-runner-results.yml'
-            work_dir_path = os.path.join(test_dir.path, 'working')
+            parent_work_dir_path = os.path.join(test_dir.path, 'working')
 
             pom_file_path = os.path.join(test_dir.path, 'pom.xml')
             step_config = {
@@ -188,7 +182,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
 
             step_implementer = self.create_step_implementer(
                 step_config=step_config,
-                work_dir_path=work_dir_path,
+                parent_work_dir_path=parent_work_dir_path,
             )
 
             # mock effective pom
@@ -199,7 +193,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
             write_effective_pom_mock.side_effect = write_effective_pom_mock_side_effect
 
             # first call
-            expected_effective_pom_path = os.path.join(work_dir_path, 'effective-pom.xml')
+            expected_effective_pom_path = os.path.join(step_implementer.work_dir_path, 'effective-pom.xml')
             actual_effective_pom_path = step_implementer._get_effective_pom()
             self.assertEqual(actual_effective_pom_path, expected_effective_pom_path)
             write_effective_pom_mock.assert_called_once_with(
@@ -209,7 +203,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
 
             # second call
             write_effective_pom_mock.reset_mock()
-            expected_effective_pom_path = os.path.join(work_dir_path, 'effective-pom.xml')
+            expected_effective_pom_path = os.path.join(step_implementer.work_dir_path, 'effective-pom.xml')
             actual_effective_pom_path = step_implementer._get_effective_pom()
             self.assertEqual(actual_effective_pom_path, expected_effective_pom_path)
             write_effective_pom_mock.assert_not_called()
@@ -220,7 +214,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
         with TempDirectory() as test_dir:
             results_dir_path = os.path.join(test_dir.path, 'step-runner-results')
             results_file_name = 'step-runner-results.yml'
-            work_dir_path = os.path.join(test_dir.path, 'working')
+            parent_work_dir_path = os.path.join(test_dir.path, 'working')
 
             pom_file_path = os.path.join(test_dir.path, 'pom.xml')
             step_config = {
@@ -229,7 +223,7 @@ class TestStepImplementerSharedMavenGeneric(BaseStepImplementerTestCase):
 
             step_implementer = self.create_step_implementer(
                 step_config=step_config,
-                work_dir_path=work_dir_path,
+                parent_work_dir_path=parent_work_dir_path,
             )
 
             def get_effective_pom_side_effect():
