@@ -92,15 +92,33 @@ def get_xml_element_by_path(xml_file_path, xpath, default_namespace=None, xml_na
 
     return xml_file.find(xpath, namespaces)
 
-def parse_xml_element_for_attributes(xml_file_path, xml_element, attribs):
+def aggregate_xml_element_attribute_values(xml_file_path, xml_element, attribs):
     """
-    Function to parse a XML file looking for a specific element and obtaining its attributes
+    Function to parse a XML file looking for a specific element and obtaining its attributes.
 
-    Vars:   xml_file_path   - Path to directory containing XML files
-            xml_element     - XML element being searched for
-            attribs         - List of attributes being searched for in the XML element
+    If element is not found in file the file is ignored.
 
-    Returns: A dictionary of attribute values.
+    If attribute is not found in element the file is ignored.
+
+    Parameters
+    ----------
+    xml_file_path: str
+        Path to directory containing XML files
+    xml_element: str
+        XML element being searched for
+    attribs: list
+        List of attributes being searched for in the XML element
+
+    Returns: 
+    
+    report_results: dict
+        A dictionary of attribute values.
+
+    Raises
+    ------
+    ValueError
+        If XML element is not found in file(s)
+
     """
 
     report_results = {}
@@ -113,21 +131,30 @@ def parse_xml_element_for_attributes(xml_file_path, xml_element, attribs):
         xml_files = [xml_file_path]
 
     print("files: " + str(xml_files))
+
+    print("file exists: " +str(os.path.isfile(xml_files[0])))
+    with open(xml_files[0], "r") as f:
+        print("line: " + f.read())
+
     #Iterate over XML files
     for file in xml_files:
+       
         try:
             pom_element = get_xml_element(file, xml_element)
-        except ValueError as error:
-            print(f"Error parsing XML file for element: {error}")
-            #raise StepRunnerException(f"Error parsing XML file for element: {error}") from error
-
-        #Add attributes to dictionary
-        for attrib in attribs:
-            attribute_value = pom_element.attrib[attrib]
-            # aggregate attribute accross multiple files
-            if attrib in report_results:
-                report_results[attrib] = str(float(report_results[attrib]) + float(attribute_value))
-            else:
-                report_results[attrib] = attribute_value
+            #Add attributes to dictionary
+            for attrib in attribs:
+                if attrib in pom_element.attrib:
+                    attribute_value = pom_element.attrib[attrib]
+                    # aggregate attribute accross multiple files
+                    if attrib in report_results:
+                        report_results[attrib] = str(float(report_results[attrib]) + float(attribute_value))
+                    else:
+                        report_results[attrib] = attribute_value
+                else:
+                    pass
+        except ValueError:
+            pass
+     
+        
 
     return report_results

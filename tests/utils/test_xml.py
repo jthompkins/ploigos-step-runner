@@ -6,7 +6,7 @@ import os
 from os import path
 from testfixtures import TempDirectory
 from tests.helpers.base_test_case import BaseTestCase
-from ploigos_step_runner.utils.xml import get_xml_element, get_xml_element_by_path, parse_xml_element_for_attributes
+from ploigos_step_runner.utils.xml import get_xml_element, get_xml_element_by_path, aggregate_xml_element_attribute_values
 
 # pylint: disable=no-self-use
 class TestXMLUtils(BaseTestCase):
@@ -221,7 +221,6 @@ class TestXMLUtils(BaseTestCase):
     def test_parse_xml_element_for_attributes(self):
         """Test to get an xml attribute from xml element
 
-        xml_file_path, xml_element, attribs
         """
 
         sample_file_path = os.path.join(
@@ -233,8 +232,45 @@ class TestXMLUtils(BaseTestCase):
         element = 'testsuite'
         attribs = ['time', 'tests']
 
-        results = parse_xml_element_for_attributes(sample_file_path, element, attribs)
+        results = aggregate_xml_element_attribute_values(sample_file_path, element, attribs)
 
         expected_results = {'tests': '3', 'time': '4.485'}
 
         self.assertEqual(results, expected_results)
+
+    def test_parse_xml_element_for_attributes_multiple_files(self):
+        """Test that element attributes are aggregated if multiple files with same element/attributes exist.
+
+        """
+
+        sample_file_path = os.path.join(
+            os.path.dirname(__file__),
+            'files/multiple_xml'
+        )
+
+        element = 'testsuite'
+        attribs = ['time', 'tests']
+
+        results = aggregate_xml_element_attribute_values(sample_file_path, element, attribs)
+
+        expected_results = {'tests': '6.0', 'time': '8.97'}
+
+        self.assertEqual(results, expected_results)
+
+    def test_parse_xml_element_for_attributes_element_not_found(self):
+        """Test that function returns empty dict if element is not found in file.
+
+        """
+
+        sample_file_path = os.path.join(
+            os.path.dirname(__file__),
+            'files',
+            'sample.xml'
+        )
+
+        element = 'testsuite2'
+        attribs = ['time', 'tests']
+
+        results = aggregate_xml_element_attribute_values(sample_file_path, element, attribs)
+        print(str(results))
+        self.assertEqual(results, {})

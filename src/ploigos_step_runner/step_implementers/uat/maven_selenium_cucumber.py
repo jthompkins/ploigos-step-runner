@@ -48,7 +48,7 @@ from ploigos_step_runner.exceptions import StepRunnerException
 from ploigos_step_runner.step_implementers.shared.maven_generic import MavenGeneric
 from ploigos_step_runner import StepResult
 from ploigos_step_runner.utils.io import create_sh_redirect_to_multiple_streams_fn_callback
-from ploigos_step_runner.utils.xml import get_xml_element
+from ploigos_step_runner.utils.xml import get_xml_element, aggregate_xml_element_attribute_values
 
 DEFAULT_CONFIG = {
     'tls-verify': True,
@@ -257,10 +257,13 @@ class MavenSeleniumCucumber(MavenGeneric):
             value=cucumber_json_report_path
         )
 
-        """
+        
         attribs = ["time", "tests", "errors", "skipped", "failures"]
         xml_element = "testsuite"
-        report_results = parse_xml_element_for_attributes(test_results_dir, attribs, step_result)
+
+        print("test results dir: " +str(test_results_dir))
+
+        report_results = aggregate_xml_element_attribute_values(test_results_dir, xml_element, attribs)
 
         for attrib in attribs:
             step_result.add_evidence(
@@ -268,7 +271,7 @@ class MavenSeleniumCucumber(MavenGeneric):
                     name="uat-evidence-" + attrib,
                     value=report_results[attrib]
                 )
-        """
+        
 
         return step_result
 
