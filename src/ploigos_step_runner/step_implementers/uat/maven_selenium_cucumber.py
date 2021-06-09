@@ -48,7 +48,7 @@ from ploigos_step_runner.exceptions import StepRunnerException
 from ploigos_step_runner.step_implementers.shared.maven_generic import MavenGeneric
 from ploigos_step_runner import StepResult
 from ploigos_step_runner.utils.io import create_sh_redirect_to_multiple_streams_fn_callback
-from ploigos_step_runner.utils.xml import get_xml_element, aggregate_xml_element_attribute_values
+from ploigos_step_runner.utils.xml import aggregate_xml_element_attribute_values
 
 DEFAULT_CONFIG = {
     'tls-verify': True,
@@ -221,6 +221,8 @@ class MavenSeleniumCucumber(MavenGeneric):
                     _err=err_callback
                 )
 
+            # if not results
+            # else add evidence of results
             if not os.path.isdir(test_results_dir) or len(os.listdir(test_results_dir)) == 0:
                 if fail_on_no_tests:
                     step_result.message = "No user acceptance tests defined" \
@@ -230,6 +232,27 @@ class MavenSeleniumCucumber(MavenGeneric):
                     step_result.message = "No user acceptance tests defined" \
                         f" using maven profile ({uat_maven_profile})," \
                         " but 'fail-on-no-tests' is False."
+            else:
+                attribs = ["time", "tests", "errors", "skipped", "failures"]
+                xml_element = "testsuite"
+                report_results = aggregate_xml_element_attribute_values(
+                    test_results_dir,
+                    xml_element,
+                    attribs
+                )
+
+                for attrib in attribs:
+                    if attrib in report_results:
+                        step_result.add_evidence(
+                            description="Surefire report value for " + attrib,
+                            name="uat-evidence-" + attrib,
+                            value=report_results[attrib]
+                        )
+                    else:
+                        # TODO: fail for not beinh able to gather evidence?
+                        pass
+
+
         except sh.ErrorReturnCode:
             step_result.message = "User acceptance test failures. See 'maven-output'" \
                 ", 'surefire-reports', 'cucumber-report-html', and 'cucumber-report-json'" \
@@ -257,29 +280,17 @@ class MavenSeleniumCucumber(MavenGeneric):
             value=cucumber_json_report_path
         )
 
-        
-        attribs = ["time", "tests", "errors", "skipped", "failures"]
-        xml_element = "testsuite"
 
-        print("test results dir: " +str(test_results_dir))
 
-        report_results = aggregate_xml_element_attribute_values(test_results_dir, xml_element, attribs)
 
-        for attrib in attribs:
-            step_result.add_evidence(
-                    description="Surefire report value for " + attrib,
-                    name="uat-evidence-" + attrib,
-                    value=report_results[attrib]
-                )
-        
 
         return step_result
 
-    
-        
-            
 
-                    
+
+
+
+
 
 
 

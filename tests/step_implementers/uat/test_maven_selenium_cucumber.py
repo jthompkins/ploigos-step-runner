@@ -145,13 +145,15 @@ class TestStepImplementerMavenSeleniumCucumber_Other(TestStepImplementerMavenSel
         write_mock_test_results=True,
         assert_mvn_called=True,
         assert_report_artifact=True,
+        assert_evidence=True,
         expected_result_success=True,
         expected_result_message='',
         fail_on_no_tests=None,
         uat_maven_profile=None,
         pom_file_name='pom.xml',
         raise_error_on_tests=False,
-        set_tls_verify_false=False
+        set_tls_verify_false=False,
+        aggregate_xml_element_attribute_values_mock=None
     ):
         parent_work_dir_path = os.path.join(test_dir.path, 'working')
 
@@ -215,6 +217,10 @@ class TestStepImplementerMavenSeleniumCucumber_Other(TestStepImplementerMavenSel
                 ],
                 raise_error_on_tests=raise_error_on_tests
             )
+
+        # mock evidence
+        if aggregate_xml_element_attribute_values_mock:
+            aggregate_xml_element_attribute_values_mock.return_value = {'time': '00:42'}
 
         result = step_implementer._run_step()
         if assert_mvn_called:
@@ -286,6 +292,15 @@ class TestStepImplementerMavenSeleniumCucumber_Other(TestStepImplementerMavenSel
                 value=cucumber_json_report_path
             )
 
+        if assert_evidence:
+            expected_step_result.add_evidence(
+                name='uat-evidence-time',
+                description='Surefire report value for time',
+                value='00:42'
+            )
+
+        print(expected_step_result)
+        print(result)
         self.assertEqual(expected_step_result, result)
 
     @patch.object(MavenSeleniumCucumber, '_generate_maven_settings')
@@ -395,6 +410,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                 set_tls_verify_false=True
             )
 
+    @patch('ploigos_step_runner.step_implementers.uat.maven_selenium_cucumber.aggregate_xml_element_attribute_values')
     @patch.object(MavenSeleniumCucumber, '_generate_maven_settings')
     @patch('sh.mvn', create=True)
     @patch('ploigos_step_runner.step_implementers.shared.maven_generic.write_effective_pom')
@@ -402,7 +418,8 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         self,
         write_effective_pom_mock,
         mvn_mock,
-        generate_maven_settings_mock
+        generate_maven_settings_mock,
+        aggregate_xml_element_attribute_values_mock
     ):
         with TempDirectory() as test_dir:
             group_id = 'com.mycompany.app'
@@ -443,6 +460,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                 selenium_hub_url='https://test.xyz:4444',
                 write_effective_pom_mock=write_effective_pom_mock,
                 generate_maven_settings_mock=generate_maven_settings_mock,
+                aggregate_xml_element_attribute_values_mock=aggregate_xml_element_attribute_values_mock,
                 pom_content=pom_content,
                 group_id=group_id,
                 artifact_id=artifact_id,
@@ -450,6 +468,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                 deployed_host_urls=deployed_host_urls
             )
 
+    @patch('ploigos_step_runner.step_implementers.uat.maven_selenium_cucumber.aggregate_xml_element_attribute_values')
     @patch.object(MavenSeleniumCucumber, '_generate_maven_settings')
     @patch('sh.mvn', create=True)
     @patch('ploigos_step_runner.step_implementers.shared.maven_generic.write_effective_pom')
@@ -457,7 +476,8 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         self,
         write_effective_pom_mock,
         mvn_mock,
-        generate_maven_settings_mock
+        generate_maven_settings_mock,
+        aggregate_xml_element_attribute_values_mock
     ):
         with TempDirectory() as test_dir:
             group_id = 'com.mycompany.app'
@@ -498,6 +518,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                 selenium_hub_url='https://test.xyz:4444',
                 write_effective_pom_mock=write_effective_pom_mock,
                 generate_maven_settings_mock=generate_maven_settings_mock,
+                aggregate_xml_element_attribute_values_mock=aggregate_xml_element_attribute_values_mock,
                 pom_content=pom_content,
                 group_id=group_id,
                 artifact_id=artifact_id,
