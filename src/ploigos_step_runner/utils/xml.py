@@ -35,7 +35,10 @@ def get_xml_element(xml_file, element_name):
         xml_namespace = xml_namespace_match.group(0)
 
     # extract needed information from the xml file
-    xml_element = xml_xml.getroot().find('./' + xml_namespace + element_name)
+    if xml_root.tag == element_name:
+        xml_element = xml_root
+    else:
+        xml_element = xml_root.find('./' + xml_namespace + element_name)
 
     # verify information from xml file
     if xml_element is None:
@@ -113,19 +116,18 @@ def parse_xml_element_for_attributes(xml_file_path, xml_element, attribs):
     #Iterate over XML files
     for file in xml_files:
         try:
-            pom_element = get_xml_element(file, xml_element).text
+            pom_element = get_xml_element(file, xml_element)
         except ValueError as error:
             print(f"Error parsing XML file for element: {error}")
             #raise StepRunnerException(f"Error parsing XML file for element: {error}") from error
 
         #Add attributes to dictionary
         for attrib in attribs:
-
             attribute_value = pom_element.attrib[attrib]
-
-            if report_results[attrib] is None:
-                report_results[attrib] = attribute_value
-            else:
+            # aggregate attribute accross multiple files
+            if attrib in report_results:
                 report_results[attrib] = str(float(report_results[attrib]) + float(attribute_value))
+            else:
+                report_results[attrib] = attribute_value
 
     return report_results
