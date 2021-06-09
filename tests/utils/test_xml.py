@@ -219,8 +219,8 @@ class TestXMLUtils(BaseTestCase):
             assert element is None
 
     def test_parse_xml_element_for_attributes(self):
-        """Test to get an xml attribute from xml element 
-        
+        """Test to get an xml attribute from xml element
+
         xml_file_path, xml_element, attribs
         """
 
@@ -238,7 +238,3 @@ class TestXMLUtils(BaseTestCase):
         expected_results = {'tests': '3', 'time': '4.485'}
 
         self.assertEqual(results, expected_results)
-        
-
-
-
